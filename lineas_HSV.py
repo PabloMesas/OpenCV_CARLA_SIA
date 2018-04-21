@@ -19,6 +19,6 @@ mask = cv2.inRange(hsv, lower_road_line_color, upper_road_line_color)
 # Bitwise-AND mask and original image
 res = cv2.bitwise_and(img,img, mask= mask)
 
-cv2.imwrite('hasv_1.jpg',hsv)
-cv2.imwrite('hasv_2.jpg',mask)
-cv2.imwrite('hasv_3.jpg',res)
+cv2.imwrite('./Salida/hasv_1.jpg',hsv)
+cv2.imwrite('./Salida/hasv_2.jpg',mask)
+cv2.imwrite('./Salida/hasv_3.jpg',res)
