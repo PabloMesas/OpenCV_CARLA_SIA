@@ -26,8 +26,9 @@ while(cap.isOpened()):
         edges = cv2.Canny(gray,50,150,apertureSize = 3)
         _, binary = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)
         cv2.imwrite('./Salida/lineas_edges.jpg',binary)
-        lines = cv2.HoughLines(binary,1,np.pi/180,200)
+        lines = cv2.HoughLines(binary,1,np.pi/180,250)
         edges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
+        binary = cv2.cvtColor(binary,cv2.COLOR_GRAY2BGR)
 
         try:
             for line in lines:
@@ -43,10 +44,11 @@ while(cap.isOpened()):
 
                     cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2)                    
                     cv2.line(edges,(x1,y1),(x2,y2),(0,0,255),2)
+                    cv2.line(binary,(x1,y1),(x2,y2),(0,0,255),2)
         except TypeError:
             print('Error Loco')
 
-        cv2.imshow("result", frame)
+        cv2.imshow("result", binary)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
