@@ -30,6 +30,7 @@ while(cap.isOpened()):
         closing = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
         erosion = cv2.erode(closing,kernel,iterations = 1)
 
+        lines_p = cv2.HoughLinesP(edges,1,np.pi/180,100,minLineLength = 80,maxLineGap = 50)
         lines = cv2.HoughLines(erosion,1,np.pi/180,100)
         
         edges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
@@ -37,6 +38,13 @@ while(cap.isOpened()):
 
 
         try:
+            print (len(lines_p))
+            for line in lines_p:
+                x1,y1,x2,y2 = line[0]
+                cv2.line(frame,(x1,y1),(x2,y2),(255,0,0),2)
+                cv2.line(edges,(x1,y1),(x2,y2),(255,0,0),2)
+                cv2.line(binary,(x1,y1),(x2,y2),(255,0,0),2)
+
             for line in lines:
                 for rho,theta in line:
                     a = np.cos(theta) #pendiente
@@ -54,7 +62,10 @@ while(cap.isOpened()):
         except TypeError:
             print('Error Loco')
 
-        cv2.imshow("result", frame)
+        except ValueError:
+            print('Error Loco Probabilistica')
+
+        cv2.imshow("result", edges)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
