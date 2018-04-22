@@ -25,10 +25,16 @@ while(cap.isOpened()):
         gray = cv2.cvtColor(res,cv2.COLOR_BGR2GRAY)
         edges = cv2.Canny(gray,50,150,apertureSize = 3)
         _, binary = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)
-        cv2.imwrite('./Salida/lineas_edges.jpg',binary)
-        lines = cv2.HoughLines(binary,1,np.pi/180,250)
+        # cv2.imwrite('./Salida/lineas_edges.jpg',binary)
+        kernel = np.ones((12,12),np.uint8)
+        closing = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
+        erosion = cv2.erode(closing,kernel,iterations = 1)
+
+        lines = cv2.HoughLines(erosion,1,np.pi/180,100)
+        
         edges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
         binary = cv2.cvtColor(binary,cv2.COLOR_GRAY2BGR)
+
 
         try:
             for line in lines:
@@ -48,7 +54,7 @@ while(cap.isOpened()):
         except TypeError:
             print('Error Loco')
 
-        cv2.imshow("result", binary)
+        cv2.imshow("result", frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
