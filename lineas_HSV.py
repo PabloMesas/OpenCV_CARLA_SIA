@@ -71,7 +71,7 @@ while(cap.isOpened()):
         small_original = cv2.resize(original_frame, (0,0), fx=0.45, fy=0.45)
         small_frame = cv2.resize(frame, (0,0), fx=0.45, fy=0.45)
         small_edges = cv2.resize(edges, (0,0), fx=0.45, fy=0.45)
-        small_binary = cv2.resize(opening, (0,0), fx=0.45, fy=0.45)
+        small_binary = cv2.resize(binary, (0,0), fx=0.45, fy=0.45)
         cv2.imshow("result_original", small_original)
         cv2.moveWindow('result_original',0,0)
         cv2.imshow("result_processed", small_frame)
@@ -80,6 +80,11 @@ while(cap.isOpened()):
         cv2.moveWindow('result_edges',0,720)
         cv2.imshow("result_binary", small_binary)
         cv2.moveWindow('result_binary',600,0)
+
+        if cv2.waitKey(1) & 0xFF == ord(' '):
+            while(not(cv2.waitKey(1) & 0xFF == ord(' '))):
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
