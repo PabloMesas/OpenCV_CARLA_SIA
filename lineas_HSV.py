@@ -6,9 +6,9 @@ cap = cv2.VideoCapture('./Originales/longroad1.gif')
 
 while(cap.isOpened()):
     ret, frame = cap.read()
-    original_frame = frame.copy()
+    
     if ret == True :
-        
+        original_frame = frame.copy()
         # Convert BGR to HSV
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -31,8 +31,8 @@ while(cap.isOpened()):
         closing = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
         erosion = cv2.erode(closing,kernel,iterations = 1)
 
-        lines_p = cv2.HoughLinesP(edges,1,np.pi/180,100,minLineLength = 80,maxLineGap = 50)
-        lines = cv2.HoughLines(erosion,1,np.pi/180,100)
+        lines_p = cv2.HoughLinesP(edges,1,np.pi/180,100,minLineLength = 50,maxLineGap = 100)
+        # lines = cv2.HoughLines(erosion,1,np.pi/180,100)
         
         edges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
         binary = cv2.cvtColor(binary,cv2.COLOR_GRAY2BGR)
@@ -46,20 +46,20 @@ while(cap.isOpened()):
                 cv2.line(edges,(x1,y1),(x2,y2),(255,0,0),2)
                 # cv2.line(binary,(x1,y1),(x2,y2),(255,0,0),2)
 
-            for line in lines:
-                for rho,theta in line:
-                    a = np.cos(theta) #pendiente
-                    b = np.sin(theta) #pendiente
-                    x0 = a*rho #desplazamiento en X
-                    y0 = b*rho #desplazamiento en Y
-                    x1 = int(x0 + 1000*(-b))
-                    y1 = int(y0 + 1000*(a))
-                    x2 = int(x0 - 1000*(-b))
-                    y2 = int(y0 - 1000*(a))
+            # for line in lines:
+            #     for rho,theta in line:
+            #         a = np.cos(theta) #pendiente
+            #         b = np.sin(theta) #pendiente
+            #         x0 = a*rho #desplazamiento en X
+            #         y0 = b*rho #desplazamiento en Y
+            #         x1 = int(x0 + 1000*(-b))
+            #         y1 = int(y0 + 1000*(a))
+            #         x2 = int(x0 - 1000*(-b))
+            #         y2 = int(y0 - 1000*(a))
 
-                    cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2)                    
-                    cv2.line(edges,(x1,y1),(x2,y2),(0,0,255),2)
-                    # cv2.line(binary,(x1,y1),(x2,y2),(0,0,255),2)
+            #         cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2)                    
+            #         cv2.line(edges,(x1,y1),(x2,y2),(0,0,255),2)
+            #         # cv2.line(binary,(x1,y1),(x2,y2),(0,0,255),2)
         except TypeError:
             print('En este frame no hay líneas')
 
@@ -70,7 +70,7 @@ while(cap.isOpened()):
         small_original = cv2.resize(original_frame, (0,0), fx=0.5, fy=0.5)
         small_frame = cv2.resize(frame, (0,0), fx=0.5, fy=0.5)
         small_edges = cv2.resize(edges, (0,0), fx=0.5, fy=0.5)
-        small_binary = cv2.resize(binary, (0,0), fx=0.5, fy=0.5)
+        small_binary = cv2.resize(erosion, (0,0), fx=0.5, fy=0.5)
         cv2.imshow("result_original", small_original)
         cv2.moveWindow('result_original',0,0)
         cv2.imshow("result_processed", small_frame)
