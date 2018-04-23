@@ -1,8 +1,9 @@
 import numpy as np
 import cv2
+from time import sleep
 print (cv2.__version__)
 
-cap = cv2.VideoCapture('./Originales/longroad1.gif')
+cap = cv2.VideoCapture('./Originales/longroad2.gif')
 
 while(cap.isOpened()):
     ret, frame = cap.read()
@@ -27,11 +28,11 @@ while(cap.isOpened()):
         edges = cv2.Canny(gray,50,150,apertureSize = 3)
         _, binary = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)
         # cv2.imwrite('./Salida/lineas_edges.jpg',binary)
-        kernel = np.ones((12,12),np.uint8)
-        closing = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
-        erosion = cv2.erode(closing,kernel,iterations = 1)
+        kernel = np.ones((2,2),np.uint8)
+        opening = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+        erosion = cv2.erode(opening,kernel,iterations = 1)
 
-        lines_p = cv2.HoughLinesP(edges,1,np.pi/180,100,minLineLength = 50,maxLineGap = 100)
+        lines_p = cv2.HoughLinesP(edges,1,np.pi/180,100,minLineLength = 50,maxLineGap = 150)
         # lines = cv2.HoughLines(erosion,1,np.pi/180,100)
         
         edges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
@@ -67,22 +68,22 @@ while(cap.isOpened()):
             print('En este frame no se detectan líneas por el método probabilístico')
 
         # Mostrar ventana
-        small_original = cv2.resize(original_frame, (0,0), fx=0.5, fy=0.5)
-        small_frame = cv2.resize(frame, (0,0), fx=0.5, fy=0.5)
-        small_edges = cv2.resize(edges, (0,0), fx=0.5, fy=0.5)
-        small_binary = cv2.resize(erosion, (0,0), fx=0.5, fy=0.5)
+        small_original = cv2.resize(original_frame, (0,0), fx=0.45, fy=0.45)
+        small_frame = cv2.resize(frame, (0,0), fx=0.45, fy=0.45)
+        small_edges = cv2.resize(edges, (0,0), fx=0.45, fy=0.45)
+        small_binary = cv2.resize(opening, (0,0), fx=0.45, fy=0.45)
         cv2.imshow("result_original", small_original)
         cv2.moveWindow('result_original',0,0)
         cv2.imshow("result_processed", small_frame)
-        cv2.moveWindow('result_processed',650,500)
+        cv2.moveWindow('result_processed',600,720)
         cv2.imshow("result_edges", small_edges)
-        cv2.moveWindow('result_edges',1300,0)
+        cv2.moveWindow('result_edges',0,720)
         cv2.imshow("result_binary", small_binary)
-        cv2.moveWindow('result_binary',650,0)
+        cv2.moveWindow('result_binary',600,0)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     else:
         break
-
+    # sleep(0.08)
 cv2.destroyAllWindows()
