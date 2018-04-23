@@ -6,6 +6,7 @@ cap = cv2.VideoCapture('./Originales/longroad1.gif')
 
 while(cap.isOpened()):
     ret, frame = cap.read()
+    original_frame = frame.copy()
     if ret == True :
         
         # Convert BGR to HSV
@@ -43,7 +44,7 @@ while(cap.isOpened()):
                 x1,y1,x2,y2 = line[0]
                 cv2.line(frame,(x1,y1),(x2,y2),(255,0,0),2)
                 cv2.line(edges,(x1,y1),(x2,y2),(255,0,0),2)
-                cv2.line(binary,(x1,y1),(x2,y2),(255,0,0),2)
+                # cv2.line(binary,(x1,y1),(x2,y2),(255,0,0),2)
 
             for line in lines:
                 for rho,theta in line:
@@ -58,14 +59,26 @@ while(cap.isOpened()):
 
                     cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2)                    
                     cv2.line(edges,(x1,y1),(x2,y2),(0,0,255),2)
-                    cv2.line(binary,(x1,y1),(x2,y2),(0,0,255),2)
+                    # cv2.line(binary,(x1,y1),(x2,y2),(0,0,255),2)
         except TypeError:
-            print('Error Loco')
+            print('En este frame no hay líneas')
 
         except ValueError:
-            print('Error Loco Probabilistica')
+            print('En este frame no se detectan líneas por el método probabilístico')
 
-        cv2.imshow("result", edges)
+        # Mostrar ventana
+        small_original = cv2.resize(original_frame, (0,0), fx=0.5, fy=0.5)
+        small_frame = cv2.resize(frame, (0,0), fx=0.5, fy=0.5)
+        small_edges = cv2.resize(edges, (0,0), fx=0.5, fy=0.5)
+        small_binary = cv2.resize(binary, (0,0), fx=0.5, fy=0.5)
+        cv2.imshow("result_original", small_original)
+        cv2.moveWindow('result_original',0,0)
+        cv2.imshow("result_processed", small_frame)
+        cv2.moveWindow('result_processed',650,500)
+        cv2.imshow("result_edges", small_edges)
+        cv2.moveWindow('result_edges',1300,0)
+        cv2.imshow("result_binary", small_binary)
+        cv2.moveWindow('result_binary',650,0)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
