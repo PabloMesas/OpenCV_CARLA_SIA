@@ -1,9 +1,9 @@
 import numpy as np
-import cv2 as cv2
+from cv2 import cv2 
 from time import sleep
 print (cv2.__version__)
 
-cap = cv2.VideoCapture('./Originales/longroad1.gif')
+cap = cv2.VideoCapture('./Originales/longroad2.gif')
 
 while(cap.isOpened()):
     ret, frame = cap.read()
