@@ -12,11 +12,11 @@ for degree in degrees_list:
 small_original = cv2.resize(img, (0,0), fx=0.5, fy=0.5)
 small_frame = cv2.resize(crazy_lines, (0,0), fx=0.5, fy=0.5)
 
-cv2.imshow("result_original", small_original)
-cv2.moveWindow('result_original',250,400)
+cv2.imshow("original", small_original)
+cv2.moveWindow('original',250,400)
 
-cv2.imshow("result_processed", small_frame)
-cv2.moveWindow('result_processed',950,400)
+cv2.imshow("processed", small_frame)
+cv2.moveWindow('processed',950,400)
 ##################################################################
 
 while(True):

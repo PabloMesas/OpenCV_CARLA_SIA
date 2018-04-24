@@ -30,9 +30,9 @@ def get_road_line(frame_RGB):
     angles_degrees = []
     try:
             # print (lines_p)
-            for line in lines_p:
-                x1,y1,x2,y2 = line[0]
-                angles_degrees.append(get_line_angle(x1,y1,x2,y2))
+            for line in lines_p: #Print the lines on the Original Frame
+                x1,y1,x2,y2 = line[0] #Points to obtain a line
+                angles_degrees.append(get_line_angle(x1,y1,x2,y2)) #Save the angle
                 cv2.line(frame,(x1,y1),(x2,y2),(255,0,0),2)
 
     except TypeError:
@@ -44,6 +44,6 @@ def get_road_line(frame_RGB):
     return frame, angles_degrees
 
 def get_line_angle(x1,y1,x2,y2): # Obtain the angle of the line between the point x1,y1 & x2,y2
-    pendiente = (y2-y1)/(x2-x1)
-    degrees = ((np.arctan(pendiente) * 180)/np.pi)
+    slope = (y2-y1)/(x2-x1) #Get the slope of the line with the line formula y=x*m + c
+    degrees = ((np.arctan(slope) * 180)/np.pi) #Transform the radians to degrees with 180/pi
     return degrees
