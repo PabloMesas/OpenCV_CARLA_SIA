@@ -1,9 +1,9 @@
 import numpy as np
-import cv2
+import cv2 as cv2
 from time import sleep
 print (cv2.__version__)
 
-cap = cv2.VideoCapture('./Originales/longroad2.gif')
+cap = cv2.VideoCapture('./Originales/longroad1.gif')
 
 while(cap.isOpened()):
     ret, frame = cap.read()
@@ -16,6 +16,7 @@ while(cap.isOpened()):
         # define range Road Line color in HSV
         road_line_color = np.uint8([[[109,196,217 ]]])
         hsv_green = cv2.cvtColor(road_line_color,cv2.COLOR_BGR2HSV)
+        print (hsv_green)
         lower_road_line_color = np.array([14,100,100])
         upper_road_line_color = np.array([40,255,217])
 
@@ -72,12 +73,16 @@ while(cap.isOpened()):
         small_frame = cv2.resize(frame, (0,0), fx=0.45, fy=0.45)
         small_edges = cv2.resize(edges, (0,0), fx=0.45, fy=0.45)
         small_binary = cv2.resize(binary, (0,0), fx=0.45, fy=0.45)
+
         cv2.imshow("result_original", small_original)
         cv2.moveWindow('result_original',0,0)
+        
         cv2.imshow("result_processed", small_frame)
         cv2.moveWindow('result_processed',600,720)
+
         cv2.imshow("result_edges", small_edges)
         cv2.moveWindow('result_edges',0,720)
+        
         cv2.imshow("result_binary", small_binary)
         cv2.moveWindow('result_binary',600,0)
 
