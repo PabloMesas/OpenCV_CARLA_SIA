@@ -15,6 +15,9 @@ import logging
 import random
 import time
 
+import cv2
+import detection_car_driving as eyes
+
 from carla.client import make_carla_client
 from carla.sensor import Camera, Lidar
 from carla.settings import CarlaSettings
@@ -59,10 +62,11 @@ def run_carla_client(args):
 
                 # The default camera captures RGB images of the scene.
                 camera0 = Camera('CameraRGB')
+                camera0.set(FOV=140.0)
                 # Set image resolution in pixels.
                 camera0.set_image_size(1280, 720) #lol hd pictures pls
                 # Set its position relative to the car in meters.
-                camera0.set_position(0.30, 0, 1.30)
+                camera0.set_position(2.10, 0, 1.10)
                 settings.add_sensor(camera0)
 
                 # Let's add another camera producing ground-truth depth. lol pa k
@@ -113,13 +117,20 @@ def run_carla_client(args):
                 measurements, sensor_data = client.read_data()
 
                 # Print some of the measurements.
-                print_measurements(measurements)
+                # print_measurements(measurements)
+
+                if args.smart_driver_SIA:
+                    img = cv2.cvtColor(sensor_data['CameraRGB'].data, cv2.COLOR_RGB2BGR)
+                    crazy_lines, degrees_list = eyes.get_road_line(img)
+                    for degree in degrees_list:
+                        print('Degree: ' , degree)
+                    cv2.imwrite('Salida/lol' + str(frame) +'.jpg', crazy_lines)
 
                 # Save the images to disk if requested.
                 if args.save_images_to_disk:
                     for name, measurement in sensor_data.items():
                         filename = args.out_filename_format.format(episode, name, frame)
-                        measurement.save_to_disk(filename)
+                        measurement.save_to_disk(filename)                    
 
                 # We can access the encoded data of a given image as numpy
                 # array using its "data" property. For instance, to get the
@@ -151,7 +162,7 @@ def run_carla_client(args):
                     # will add some noise to the steer.
 
                     control = measurements.player_measurements.autopilot_control
-                    #control.steer += random.uniform(-0.1, 0.1) rly nigga??
+                    control.steer += random.uniform(-0.1, 0.1) #rly nigga??
                     client.send_control(control)
 
 
@@ -213,6 +224,11 @@ def main():
         action='store_true',
         dest='save_images_to_disk',
         help='save images (and Lidar data if active) to disk')
+    argparser.add_argument(
+        '-sia',
+        action='store_true',
+        dest='smart_driver_SIA',
+        help='use the frames with the smart brain developed in SIA')
     argparser.add_argument(
         '-c', '--carla-settings',
         metavar='PATH',
