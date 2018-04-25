@@ -1,1 +1,1 @@
-# OpenCV loco
+# Trabajo para Sistemas Inteligentes Avanzados con OpenCV y CARLA
