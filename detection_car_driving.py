@@ -4,9 +4,9 @@ from cv2 import cv2
 def get_road_line(frame_RGB):
 
     frame = frame_RGB.copy()
-
+    part_frame = frame[350:720, 0:1280] #Solo obtenemos la seccion del frame con la carretera
     # Convert BGR to HSV
-    frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    frame_hsv = cv2.cvtColor(part_frame, cv2.COLOR_BGR2HSV)
 
     # define range Road Line color in HSV
     # road_line_color = np.uint8([[[109,196,217 ]]])
@@ -17,7 +17,7 @@ def get_road_line(frame_RGB):
     mask = cv2.inRange(frame_hsv, lower_road_line_color, upper_road_line_color)
 
     # Bitwise-AND mask and original image
-    res = cv2.bitwise_and(frame,frame, mask= mask)
+    res = cv2.bitwise_and(part_frame,part_frame, mask= mask)
 
     gray = cv2.cvtColor(res,cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray,50,150,apertureSize = 3)
@@ -33,8 +33,8 @@ def get_road_line(frame_RGB):
             for line in lines_p: #Print the lines on the Original Frame
                 x1,y1,x2,y2 = line[0] #Points to obtain a line
                 angles_degrees.append(get_line_angle(x1,y1,x2,y2)) #Save the angle
-                cv2.line(frame,(x1,y1),(x2,y2),(255,0,0),2)
-                # cv2.line(edges,(x1,y1),(x2,y2),(255,0,0),2)
+                cv2.line(frame,(x1,y1+350),(x2,y2+350),(255,0,0),2) #Plus 350 to adapt to the full frame
+                # cv2.line(edges,(x1,y1+350),(x2,y2+350),(255,0,0),2)
 
     except TypeError:
         print('En este frame no hay líneas')
