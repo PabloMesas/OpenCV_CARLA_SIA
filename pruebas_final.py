@@ -1,7 +1,7 @@
 from cv2 import cv2
 import detection_car_driving as brain
 
-img = cv2.imread('Originales/000355.png')
+img = cv2.imread('Originales/000130.png')
 
 crazy_lines, degrees_list = brain.get_road_line(img)
 
@@ -10,6 +10,7 @@ for degree in degrees_list:
 
 
 ##############Mostrar ventanitas#################################
+# crazy_lines = crazy_lines[350:720, 0:1280] #Solo obtenemos la seccion del frame con la carretera
 small_original = cv2.resize(img, (0,0), fx=0.5, fy=0.5)
 small_frame = cv2.resize(crazy_lines, (0,0), fx=0.5, fy=0.5)
 
