@@ -2,7 +2,7 @@ import numpy as np
 from cv2 import cv2 
 
 def get_road_line(frame_RGB):
-
+    frame = abs(frame-255)
     frame = frame_RGB.copy()
     part_frame = frame[350:720, 0:1280] #Solo obtenemos la seccion del frame con la carretera
     # Convert BGR to HSV
@@ -32,9 +32,10 @@ def get_road_line(frame_RGB):
             # print (lines_p)
             for line in lines_p: #Print the lines on the Original Frame
                 x1,y1,x2,y2 = line[0] #Points to obtain a line
-                angles_degrees.append(get_line_angle(x1,y1,x2,y2)) #Save the angle
-                cv2.line(frame,(x1,y1+350),(x2,y2+350),(255,0,0),2) #Plus 350 to adapt to the full frame
-                # cv2.line(edges,(x1,y1+350),(x2,y2+350),(255,0,0),2)
+                angle = get_line_angle(x1,y1,x2,y2)
+                angles_degrees.append(angle) #Save the angle
+                cv2.line(frame,(x1,y1+350),(x2,y2+350),(255,0,0),2) #Plus 350 to adapt to the full frame after the crop
+                print_angles_frame(x1, y1, x2, y2, angle, frame) #Print the angles on the frame (for debug)
 
     except TypeError:
         print('En este frame no hay líneas')
@@ -44,7 +45,13 @@ def get_road_line(frame_RGB):
 
     return frame, angles_degrees
 
-def get_line_angle(x1,y1,x2,y2): # Obtain the angle of the line between the point x1,y1 & x2,y2
+def get_line_angle (x1,y1,x2,y2): # Obtain the angle of the line between the point x1,y1 & x2,y2
     slope = (y2-y1)/(x2-x1) #Get the slope of the line with the line formula y=x*m + c
     degrees = ((np.arctan(slope) * 180)/np.pi) #Transform the radians to degrees with 180/pi
     return degrees
+
+def print_angles_frame (x1, y1, x2, y2, angle, frame):
+    font = cv2.FONT_HERSHEY_PLAIN
+    rnd_y = np.random.randint(y2, high = y1, size = 1) # y2 sould be lower than y1
+    new_x = (x2-x1) * ((rnd_y-y1)/(y2-y1)) + x1
+    cv2.putText(frame, str(np.round(angle,decimals=2)), (new_x+10, rnd_y + 350), font, 1.5, (0,0,0), 2, cv2.LINE_AA)
