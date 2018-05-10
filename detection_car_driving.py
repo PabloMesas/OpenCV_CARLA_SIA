@@ -2,7 +2,7 @@ import numpy as np
 from cv2 import cv2 
 
 def get_road_line(frame_RGB):
-    frame = abs(frame-255)
+    #frame_RGB = cv2.flip(frame_RGB,1) #Flip verticaly the frame
     frame = frame_RGB.copy()
     part_frame = frame[350:720, 0:1280] #Solo obtenemos la seccion del frame con la carretera
     # Convert BGR to HSV
@@ -27,14 +27,19 @@ def get_road_line(frame_RGB):
 
     edges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
     binary = cv2.cvtColor(binary,cv2.COLOR_GRAY2BGR)
+    lines_angles = []
     angles_degrees = []
     try:
             # print (lines_p)
             for line in lines_p: #Print the lines on the Original Frame
                 x1,y1,x2,y2 = line[0] #Points to obtain a line
+                y1 = y1 + 350 #Plus 350 to adapt to the full frame after the crop
+                y2 = y2 + 350
                 angle = get_line_angle(x1,y1,x2,y2)
-                angles_degrees.append(angle) #Save the angle
-                cv2.line(frame,(x1,y1+350),(x2,y2+350),(255,0,0),2) #Plus 350 to adapt to the full frame after the crop
+                angles_degrees.append(angle)
+                lines_angles.append([[x1,y1,x2,y2], angle]) #Save the angle
+            
+                cv2.line(frame,(x1,y1),(x2,y2),(255,0,0),2)
                 print_angles_frame(x1, y1, x2, y2, angle, frame) #Print the angles on the frame (for debug)
 
     except TypeError:
@@ -43,15 +48,38 @@ def get_road_line(frame_RGB):
     except ValueError:
         print('En este frame no se detectan líneas por el método probabilístico')
 
+    print(lines_angles)
     return frame, angles_degrees
 
 def get_line_angle (x1,y1,x2,y2): # Obtain the angle of the line between the point x1,y1 & x2,y2
-    slope = (y2-y1)/(x2-x1) #Get the slope of the line with the line formula y=x*m + c
-    degrees = ((np.arctan(slope) * 180)/np.pi) #Transform the radians to degrees with 180/pi
+    degrees = ((get_line_slope(x1,y1,x2,y2) * 180)/np.pi) #Transform the radians to degrees with 180/pi
     return degrees
+
+def get_line_slope (x1,y1,x2,y2): #Get the slope (m) of the line with the line formula y=x*m + c
+    if x1 != x2:
+        slope = (y2-y1)/(x2-x1) #Get the slope of the line with the line formula y=x*m + c
+    else:
+        slope = np.pi/2
+    return slope #In Radians
+
+def get_line_displacement (x1,y1,x2,y2): #Get the displacement (c) of the line with the line formula y=x*m + c
+    if x1 != x2:
+        c = (y1*x2 - y2*x1)/(x2-x1)
+    else:
+        c = x1
+    return c
 
 def print_angles_frame (x1, y1, x2, y2, angle, frame):
     font = cv2.FONT_HERSHEY_PLAIN
-    rnd_y = np.random.randint(y2, high = y1, size = 1) # y2 sould be lower than y1
+    if y1 < y2:
+        rnd_y = np.random.randint(y1, high = y2, size = 1) # y1 sould be lower than y2
+    else:
+        rnd_y = np.random.randint(y2, high = y1, size = 1)
+
     new_x = (x2-x1) * ((rnd_y-y1)/(y2-y1)) + x1
-    cv2.putText(frame, str(np.round(angle,decimals=2)), (new_x+10, rnd_y + 350), font, 1.5, (0,0,0), 2, cv2.LINE_AA)
+    cv2.putText(frame, str(np.round(angle,decimals=2)), (new_x + 10, rnd_y), font, 1.5, (0,0,0), 2, cv2.LINE_AA)
+
+def distance_to_left_margin (line): #To get distance we use the point x=0, y=600
+    slope, c = line #Line is a list formed by [slope, displacement] of the line formula y = x*m + c
+    x = (600 - c)/slope
+    return x
