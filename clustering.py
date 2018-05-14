@@ -115,6 +115,6 @@ class Debug_run:
         print(data.get_index_cluster())
 
 
-print("----------\nINICIO\n----------")
-Debug_run()
-print("-----------\nFIN\n------------")
+# print("----------\nINICIO\n----------")
+# Debug_run()
+# print("-----------\nFIN\n------------")
