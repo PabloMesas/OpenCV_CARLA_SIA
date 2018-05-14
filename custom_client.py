@@ -26,7 +26,7 @@ from carla.util import print_over_same_line
 def run_carla_client(args):
     # Here we will run 4 episodes with 600 frames each.
     # One episode for each corner of the map
-    number_of_episodes = 4
+    number_of_episodes = 1
     frames_per_episode = 200
 
     # We assume the CARLA server is already waiting for a client to connect at
@@ -107,39 +107,31 @@ def run_carla_client(args):
                                     cv2.COLOR_RGB2BGR)
                     # Obtain the image with the lines of the road drawn and the
                     # degrees of the line relative the vertical of the camera
-                    crazy_lines, degrees_list = eyes.get_road_line(img)
+                    frame_data, distance, angle = eyes.get_road_line(img)
                     
                     # Writing the new images on disk
                     # Warning! You must create the dir 'Salida' in the same 
                     # level respect this script. 
                     cv2.imwrite('Salida/ep' + str(episode) + 'fr' + str(frame)
-                                + '.jpg', crazy_lines)
+                                + '.jpg', frame_data)
                     
                     # Default behaviour will be go straight forward
-                    next_steer = 0.0
-                    # Get the average average angle from list
-                    average_angle = 0.0
-                    if len(degrees_list) > 0:
-                        print('lista: ' + str(degrees_list))
-                        for degree in degrees_list:
-                            average_angle += degree
-                            print(degree)
-                        average_angle = average_angle/len(degrees_list)
-                        print('media: ' + str(average_angle))
-                        next_steer = fuzLog.getForce(-average_angle)
+                    #next_steer = -0.3
+                    #if # Control distance and angle
+                    #    next_steer = fuzLog.getForce(distance, angle)
                         
                     #print(next_steer)
                     # TODO: wait to fix fuzzylogic module
-                    client.send_control(
-                        steer=next_steer,
-                        throttle=0.5,
-                        brake=0.0,
-                        hand_brake=False,
-                        reverse=False)
+                    #client.send_control(
+                    #    steer=next_steer,
+                    #    throttle=0.5,
+                    #    brake=0.0,
+                    #    hand_brake=False,
+                    #    reverse=False)
                     
                     # In the meantime we will use the default autopilot
-                    #control = measurements.player_measurements.autopilot_control
-                    #client.send_control(control)
+                    control = measurements.player_measurements.autopilot_control
+                    client.send_control(control)
 
                 else:
                     
