@@ -76,7 +76,7 @@ def run_carla_client(args):
         client.load_settings(settings)
         
         # Setting the corners fo the map as starting positions. 
-        start_positions = [46, 97, 67, 104]
+        start_positions = [46]
         
         # Instance fuzzy logic class
         fuzLog = fl.FuzzyLogic()
