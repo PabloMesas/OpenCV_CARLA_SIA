@@ -1,7 +1,7 @@
 #!/usr/bin/env python3 
 
-# Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma de
-# Barcelona (UAB).
+# Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma
+# de Barcelona (UAB).
 #
 # This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
@@ -12,9 +12,9 @@ from __future__ import print_function
 
 import argparse
 import logging
-import random
 import time
 import detection_car_driving as eyes
+import fuzzyLogic as fl
 
 from cv2 import cv2
 from carla.client import make_carla_client
@@ -26,13 +26,13 @@ from carla.util import print_over_same_line
 def run_carla_client(args):
     # Here we will run 4 episodes with 600 frames each.
     # One episode for each corner of the map
-    number_of_episodes = 4
-    frames_per_episode = 600
+    number_of_episodes = 1
+    frames_per_episode = 200
 
     # We assume the CARLA server is already waiting for a client to connect at
     # host:port.
     with make_carla_client(args.host, args.port) as client:
-        print('CarlaClient connected')
+        #print('CarlaClient connected')
         
         if args.settings_filepath is None:
             
@@ -73,20 +73,22 @@ def run_carla_client(args):
         # with a scene description containing the available start spots for
         # the player. Here we can provide a CarlaSettings object or a
         # CarlaSettings.ini file as string.
-        scene = client.load_settings(settings)
+        client.load_settings(settings)
         
         # Setting the corners fo the map as starting positions. 
         start_positions = [46, 97, 67, 104]
-
+        
+        # Instance fuzzy logic class
+        fuzLog = fl.FuzzyLogic()
+        
         for episode in range(0, number_of_episodes):
-            
             # Setting the next start position. 
             player_start = start_positions[episode]
 
             # Notify the server that we want to start the episode at the
-            # player_start index. This function blocks until the server is ready
-            # to start the episode.
-            print('Starting new episode...')
+            # player_start index. This function blocks until the server is
+            # ready to start the episode.
+            #print('Starting new episode...')
             client.start_episode(player_start)
             
             # Iterate every frame in the episode.
@@ -96,31 +98,41 @@ def run_carla_client(args):
                 measurements, sensor_data = client.read_data()
                 
                 # Print some of the measurements.
-                print_measurements(measurements)
+                #print_measurements(measurements)
 
                 # Checking the lines of the road to guide the pilot
                 if args.smart_driver_SIA:
                     # Convert the frame to BGR
                     img = cv2.cvtColor(sensor_data['CameraRGB'].data,
-                                       cv2.COLOR_RGB2BGR)
+                                    cv2.COLOR_RGB2BGR)
                     # Obtain the image with the lines of the road drawn and the
                     # degrees of the line relative the vertical of the camera
-                    crazy_lines, degrees_list = eyes.get_road_line(img)
-                    # Traze of the angles
-                    for degree in degrees_list:
-                        print('Degree: ' , degree)
-                        
-                    # Writing the new images on disk
-                    # Warning! You must create the dir 'salida' in the same 
-                    # level respect this script. 
-                    cv2.imwrite('Salida/ep' + str(episode) + 'fr' + str(frame) +
-                                '.jpg', crazy_lines)
+                    frame_data, distance, angle = eyes.get_road_line(img)
                     
-                    # TODO: Custom autopilot.
-                    # In the meantime we will use the default autopilot.
+                    # Writing the new images on disk
+                    # Warning! You must create the dir 'Salida' in the same 
+                    # level respect this script. 
+                    cv2.imwrite('Salida/ep' + str(episode) + 'fr' + str(frame)
+                                + '.jpg', frame_data)
+                    
+                    # Default behaviour will be go straight forward
+                    #next_steer = -0.3
+                    #if # Control distance and angle
+                    #    next_steer = fuzLog.getForce(distance, angle)
+                        
+                    #print(next_steer)
+                    # TODO: wait to fix fuzzylogic module
+                    #client.send_control(
+                    #    steer=next_steer,
+                    #    throttle=0.5,
+                    #    brake=0.0,
+                    #    hand_brake=False,
+                    #    reverse=False)
+                    
+                    # In the meantime we will use the default autopilot
                     control = measurements.player_measurements.autopilot_control
                     client.send_control(control)
-                
+
                 else:
                     
                     # Run the default autopilot. 
@@ -220,7 +232,7 @@ def main():
 
             run_carla_client(args)
 
-            print('Done.')
+            #print('Done.')
             return
 
         except TCPConnectionError as error:
