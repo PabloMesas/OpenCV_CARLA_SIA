@@ -82,9 +82,9 @@ def make_carla_settings(args):
         SendNonPlayerAgentsInfo=True,
         NumberOfVehicles=0,
         NumberOfPedestrians=0,
-        WeatherId=0,
+        WeatherId=1,
         QualityLevel=args.quality_level)
-    settings.randomize_seeds()
+    # settings.randomize_seeds()
     camera0 = sensor.Camera('CameraRGB')
     camera0.set_image_size(WINDOW_WIDTH, WINDOW_HEIGHT)
     camera0.set(FOV=140.0)
@@ -203,9 +203,6 @@ class CarlaGame(object):
         #############################################################
 
         self._main_image = sensor_data.get('CameraRGB', None)
-        self._mini_view_image1 = sensor_data.get('CameraDepth', None)
-        self._mini_view_image2 = sensor_data.get('CameraSemSeg', None)
-        self._lidar_measurement = sensor_data.get('Lidar32', None)
 
         # Print measurements every second.
         if self._timer.elapsed_seconds_since_lap() > 1.0:

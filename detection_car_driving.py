@@ -47,8 +47,12 @@ def get_road_line(frame_RGB):
                 print_angles_frame(x1, y1, x2, y2, angle, frame) #Print the angles on the frame (for debug)
    
             lines_angles = sorted(lines_angles, key=lambda line: line[1]) # Sorting by angles
+            on_the_middle = (lines_angles[0][1] > -90 and lines_angles[0][1] < -70) and (lines_angles[-1][1] < 90 and lines_angles[-1][1] > 70)
+            if abs(lines_angles[0][1] - lines_angles[-1][1]) <= 30  or on_the_middle:
+                for line in lines_angles:
+                    distances.append(distance_to_left_margin(line[0][0], line[0][1]))
 
-            if abs(lines_angles[0][1] - lines_angles[-1][1]) > 15:
+            else:
                 sorted_angles = []
                 index = []
                 for pair in lines_angles:
@@ -59,25 +63,23 @@ def get_road_line(frame_RGB):
                 distance_2 = distance_to_left_margin(lines_angles[index[0]-1][0][0], lines_angles[index[0]-1][0][1])
                 if abs(distance_1) < abs(distance_2):
                     #First Cluster is Good One
-                    print ('#First Cluster is Good One')
+                    # print ('#First Cluster is Good One')
                     for i in range(0, index[0]-1, 1):
                         distances.append(distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1]))
                 else:
                     #Second Cluster is Good One
-                    print ('#Second Cluster is Good One')
+                    # print ('#Second Cluster is Good One')
                     for i in range(index[0]-1, len(lines_angles), 1):
                         distances.append(distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1]))
                     jump = index[0]-1
-                
-            else:
-                for line in lines_angles:
-                    distances.append(distance_to_left_margin(line[0][0], line[0][1]))  
             
             distances.sort()
 
-            middle_point = int((distances[0] + distances[-1])/2)
-            print_final_distance_angle(lines_angles[middle_point + jump][1], middle_point, frame)
-            return frame, middle_point, lines_angles[middle_point + jump][1]
+            middle_distance = int((distances[0] + distances[-1])/2)
+            middle_point = int(len(distances)/2)
+            middle_angle = lines_angles[middle_point + jump][1]
+            print_final_distance_angle(middle_angle, middle_distance, frame)
+            return frame, middle_angle, middle_angle
 
     except TypeError:
         print('En este frame no hay líneas')
@@ -94,7 +96,7 @@ def get_road_line(frame_RGB):
     return frame, -1, -1
 
 def get_line_angle (slope): # Obtain the angle of the line between the point x1,y1 & x2,y2
-    degrees = ((slope * 180)/np.pi) #Transform the radians to degrees with 180/pi
+    degrees = np.degrees(np.arctan(slope)) #Transform the radians to degrees with 180/pi
     return degrees
 
 def get_line_slope (x1,y1,x2,y2): #Get the slope (m) of the line with the line formula y=x*m + c
