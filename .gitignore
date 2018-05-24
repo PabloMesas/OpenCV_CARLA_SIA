@@ -1,10 +1,21 @@
 
 Originales/longroad1.gif
 .vscode/settings.json
-Salida/lineas_edges.jpg
+Salida/*
+carla/*
+test/*
+__pycache__/*
+Salida2/*
 Originales/longroad2.gif
 Originales/longroad3.gif
 Originales/longroad4.gif
-Salida/comprobacion.jpg
-__pycache__/detection_car_driving.cpython-35.pyc
-__pycache__/detection_car_driving.cpython-36.pyc
+MANIFEST.in
+Salida2.tar.gz
+client_example.py
+driving_benchmark_example.py
+manual_control.py
+point_cloud_example.py
+requirements.txt
+setup.py
+view_start_positions.py
+
