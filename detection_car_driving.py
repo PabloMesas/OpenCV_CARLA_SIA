@@ -74,8 +74,10 @@ def get_road_line(frame_RGB):
                     jump = index[0]-1
             
             distances.sort()
-
-            middle_distance = int((distances[0] + distances[-1])/2)
+            try:
+                middle_distance = int((distances[0] + distances[-1])/2)
+            except TypeError:
+                middle_distance = 0
             middle_point = int(len(distances)/2)
             middle_angle = lines_angles[middle_point + jump][1]
             print_final_distance_angle(middle_angle, middle_distance, frame)
