@@ -33,7 +33,6 @@ def get_road_line(frame_RGB):
     middle_point = 0
     jump = 0
     try:
-            # print (lines_p)
             for line in lines_p: #Print the lines on the Original Frame
                 x1,y1,x2,y2 = line[0] #Points to obtain a line
                 y1 = y1 + 350 #Plus 350 to adapt to the full frame after the crop
@@ -63,39 +62,29 @@ def get_road_line(frame_RGB):
                 distance_2 = distance_to_left_margin(lines_angles[index[0]-1][0][0], lines_angles[index[0]-1][0][1])
                 if abs(distance_1) < abs(distance_2):
                     #First Cluster is Good One
-                    # print ('#First Cluster is Good One')
                     for i in range(0, index[0]-1, 1):
                         distances.append(distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1]))
                 else:
                     #Second Cluster is Good One
-                    # print ('#Second Cluster is Good One')
                     for i in range(index[0]-1, len(lines_angles), 1):
                         distances.append(distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1]))
                     jump = index[0]-1
             
             distances.sort()
-            try:
-                middle_distance = int((distances[0] + distances[-1])/2)
-            except TypeError:
-                middle_distance = 0
+
+            middle_distance = int((distances[0] + distances[-1])/2)
             middle_point = int(len(distances)/2)
-            middle_angle = lines_angles[middle_point + jump][1]
-            print_final_distance_angle(middle_angle, middle_distance, frame)
-            return frame, middle_angle, middle_angle
+            average_angle = lines_angles[middle_point + jump][1]
+            try:
+                print_final_distance_angle(average_angle, middle_distance, frame)
+            except OverflowError:
+                middle_distance = 0
+                print_final_distance_angle(average_angle, middle_distance, frame)
+            return frame, middle_distance, average_angle
 
     except TypeError:
         print('En este frame no hay líneas')
         return frame, -1, -1
-
-    except ValueError:
-        print('En este frame no se detectan líneas por el método probabilístico')
-
-    except IndexError: 
-        return frame, -1, -1
-
-    # print(lines_angles)
-    
-    return frame, -1, -1
 
 def get_line_angle (slope): # Obtain the angle of the line between the point x1,y1 & x2,y2
     degrees = np.degrees(np.arctan(slope)) #Transform the radians to degrees with 180/pi
@@ -129,7 +118,7 @@ def print_angles_frame (x1, y1, x2, y2, angle, frame):
     cv2.putText(frame, str(np.round(angle,decimals=2)), (new_x + 10, rnd_y), font, 1.5, (0,0,0), 2, cv2.LINE_AA)
 
 def print_final_distance_angle(angle, distance, frame):
-    cv2.line(frame,(0, 600),(int(distance), 600), (0,255,0), 2)
+    cv2.line(frame,(0, 600),(distance, 600), (0,255,0), 2)
     font = cv2.FONT_HERSHEY_PLAIN
     cv2.putText(frame, str(np.round(angle,decimals=2)), (10, 550), font, 1.5, (0,0,255), 2, cv2.LINE_AA)
     cv2.putText(frame, str(np.round(distance,decimals=2)) + 'px', (10, 520), font, 1.5, (0,200,255), 2, cv2.LINE_AA)
