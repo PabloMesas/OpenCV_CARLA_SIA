@@ -21,3 +21,4 @@ view_start_positions.py
 
 *.pdf
 *.zip
+.directory
