@@ -26,13 +26,13 @@ from carla.util import print_over_same_line
 def run_carla_client(args):
     # Here we will run 4 episodes with 600 frames each.
     # One episode for each corner of the map
-    number_of_episodes = 4
-    frames_per_episode = 600
+    number_of_episodes = 2
+    frames_per_episode = 1200
 
     # We assume the CARLA server is already waiting for a client to connect at
     # host:port.
     with make_carla_client(args.host, args.port) as client:
-        print('CarlaClient connected')
+        #print('CarlaClient connected')
         
         if args.settings_filepath is None:
             
@@ -76,7 +76,7 @@ def run_carla_client(args):
         client.load_settings(settings)
         
         # Setting the corners fo the map as starting positions. 
-        start_positions = [46, 97, 67, 104]
+        start_positions = [46, 97]
         
         # Instance fuzzy logic class
         fuzLog = fl.FuzzyLogic()
@@ -88,7 +88,7 @@ def run_carla_client(args):
             # Notify the server that we want to start the episode at the
             # player_start index. This function blocks until the server is
             # ready to start the episode.
-            print('Starting new episode...')
+            #print('Starting new episode...')
             client.start_episode(player_start)
             
             # Iterate every frame in the episode.
@@ -107,37 +107,31 @@ def run_carla_client(args):
                                     cv2.COLOR_RGB2BGR)
                     # Obtain the image with the lines of the road drawn and the
                     # degrees of the line relative the vertical of the camera
-                    crazy_lines, degrees_list = eyes.get_road_line(img)
+                    frame_data, distance, angle = eyes.get_road_line(img)
                     
                     # Writing the new images on disk
                     # Warning! You must create the dir 'Salida' in the same 
                     # level respect this script. 
                     cv2.imwrite('Salida/ep' + str(episode) + 'fr' + str(frame)
-                                + '.jpg', crazy_lines)
+                                + '.jpg', frame_data)
                     
                     # Default behaviour will be go straight forward
                     next_steer = 0.0
-                    # Get the average average angle from list
-                    average_angle = 0.0
-                    if len(degrees_list) > 0:
-                        for degree in degrees_list:
-                            average_angle += degree
-                        average_angle = average_angle/len(degrees_list)
-                        print(average_angle)
-                        #next_steer = fuzLog.getForce(average_angle)
+                    if  distance != -1 and angle != -1:
+                        next_steer = fuzLog.getForce(angle, distance)
                         
                     print(next_steer)
                     # TODO: wait to fix fuzzylogic module
-                    #client.send_control(
-                    #    steer=next_steer,
-                    #    throttle=0.5,
-                    #    brake=0.0,
-                    #    hand_brake=False,
-                    #    reverse=False)
+                    client.send_control(
+                        steer=next_steer,
+                        throttle=0.5,
+                        brake=0.0,
+                        hand_brake=False,
+                        reverse=False)
                     
                     # In the meantime we will use the default autopilot
-                    control = measurements.player_measurements.autopilot_control
-                    client.send_control(control)
+                    #control = measurements.player_measurements.autopilot_control
+                    #client.send_control(control)
 
                 else:
                     
@@ -238,7 +232,7 @@ def main():
 
             run_carla_client(args)
 
-            print('Done.')
+            #print('Done.')
             return
 
         except TCPConnectionError as error:
