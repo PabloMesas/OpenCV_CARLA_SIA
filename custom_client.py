@@ -120,7 +120,7 @@ def run_carla_client(args):
                     if  distance != -1 and angle != -1:
                         next_steer = fuzLog.getForce(angle, distance)
                         
-                    print(next_steer)
+                    #print(next_steer)
                     # TODO: wait to fix fuzzylogic module
                     client.send_control(
                         steer=next_steer,
