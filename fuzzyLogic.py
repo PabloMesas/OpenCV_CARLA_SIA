@@ -16,7 +16,7 @@ class FuzzyLogic():
         forceSigma = 0.1
 
         # INPUT Variable Angle
-        self.angle = ctrl.Antecedent(np.arange(-90, 90, 0.5), 'angle')
+        self.angle = ctrl.Antecedent(np.arange(-90, 0, 0.5), 'angle')
         self.angle['too_off-center_right'] = fuzz.gaussmf(self.angle.universe, -90, angleSigma / 1.5)
         self.angle['slightly_off-center_right'] = fuzz.gaussmf(self.angle.universe, -90 + (90 + angleCenter) / 2, angleSigma)
         self.angle['centered'] = fuzz.gaussmf(self.angle.universe, angleCenter, angleSigma * 1.5)
@@ -25,11 +25,11 @@ class FuzzyLogic():
 
         # INPUT Variable Distance
         self.distance = ctrl.Antecedent(np.arange(-1280, 1280, 1), 'distance')
-        self.distance['too_far_right'] = fuzz.gaussmf(self.distance.universe, distanceCenter - distanceEdgeDistance, distanceSigma / 1.5)
-        self.distance['far_right'] = fuzz.gaussmf(self.distance.universe, distanceCenter - distanceEdgeDistance/2, distanceSigma)
+        self.distance['too_far_right'] = fuzz.gaussmf(self.distance.universe, distanceCenter + distanceEdgeDistance, distanceSigma / 1.5)
+        self.distance['far_right'] = fuzz.gaussmf(self.distance.universe, distanceCenter + distanceEdgeDistance/2, distanceSigma)
         self.distance['centered'] = fuzz.gaussmf(self.distance.universe, distanceCenter, distanceSigma * 1.5)
-        self.distance['far_left'] = fuzz.gaussmf(self.distance.universe, distanceCenter + distanceEdgeDistance/2, distanceSigma)
-        self.distance['too_far_left'] = fuzz.gaussmf(self.distance.universe, distanceCenter + distanceEdgeDistance, distanceSigma / 1.5)
+        self.distance['far_left'] = fuzz.gaussmf(self.distance.universe, distanceCenter - distanceEdgeDistance/2, distanceSigma)
+        self.distance['too_far_left'] = fuzz.gaussmf(self.distance.universe, distanceCenter - distanceEdgeDistance, distanceSigma / 1.5)
 
         # OUTPUT Variable Force
         self.force = ctrl.Consequent(np.arange(-1, 1, 0.05), 'force')
