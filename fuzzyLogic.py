@@ -9,7 +9,7 @@ class FuzzyLogic():
         angleEdgeDistance = 60
         angleSigma = 6
         distanceCenter = 215
-        distanceEdgeDistance = 2500
+        distanceEdgeDistance = 1280
         distanceSigma = 300
         forceCenter = 0
         forceEdgeDistance = .6
