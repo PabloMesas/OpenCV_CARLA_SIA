@@ -47,7 +47,7 @@ def get_road_line(frame_RGB):
    
             lines_angles = sorted(lines_angles, key=lambda line: line[1]) # Sorting by angles
             on_the_middle = (lines_angles[0][1] > -90 and lines_angles[0][1] < -70) and (lines_angles[-1][1] < 90 and lines_angles[-1][1] > 70)
-            if abs(lines_angles[0][1] - lines_angles[-1][1]) <= 15  or on_the_middle:
+            if abs(lines_angles[0][1] - lines_angles[-1][1]) <= 10  or on_the_middle:
                 for line in lines_angles:
                     distances.append(distance_to_left_margin(line[0][0], line[0][1]))
 
