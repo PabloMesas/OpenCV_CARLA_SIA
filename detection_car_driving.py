@@ -33,7 +33,6 @@ def get_road_line(frame_RGB):
     middle_point = 0
     jump = 0
     try:
-            # print (lines_p)
             for line in lines_p: #Print the lines on the Original Frame
                 x1,y1,x2,y2 = line[0] #Points to obtain a line
                 y1 = y1 + 350 #Plus 350 to adapt to the full frame after the crop
@@ -45,10 +44,14 @@ def get_road_line(frame_RGB):
                 lines_angles.append([line, angle]) #Save the angle
                 cv2.line(frame,(x1,y1),(x2,y2),(255,0,0),2)
                 print_angles_frame(x1, y1, x2, y2, angle, frame) #Print the angles on the frame (for debug)
-                
+   
             lines_angles = sorted(lines_angles, key=lambda line: line[1]) # Sorting by angles
-            
-            if abs(lines_angles[0][1] - lines_angles[-1][1]) > 15:
+            on_the_middle = (lines_angles[0][1] > -90 and lines_angles[0][1] < -70) and (lines_angles[-1][1] < 90 and lines_angles[-1][1] > 70)
+            if abs(lines_angles[0][1] - lines_angles[-1][1]) <= 15  or on_the_middle:
+                for line in lines_angles:
+                    distances.append(distance_to_left_margin(line[0][0], line[0][1]))
+
+            else:
                 sorted_angles = []
                 index = []
                 for pair in lines_angles:
@@ -58,44 +61,33 @@ def get_road_line(frame_RGB):
                 distance_1 = distance_to_left_margin(lines_angles[0][0][0], lines_angles[0][0][1]) 
                 distance_2 = distance_to_left_margin(lines_angles[index[0]-1][0][0], lines_angles[index[0]-1][0][1])
                 if abs(distance_1) < abs(distance_2):
-                    #First CLuster is Good One
-                    print ('#First CLuster is Good One')
+                    #First Cluster is Good One
                     for i in range(0, index[0]-1, 1):
-                        distances.append(distance_to_left_margin(lines_angles[i][0][0], lines_angles[1][0][1]))
+                        distances.append(distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1]))
                 else:
                     #Second Cluster is Good One
-                    print ('#Second CLuster is Good One')
                     for i in range(index[0]-1, len(lines_angles), 1):
                         distances.append(distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1]))
                     jump = index[0]-1
-                
-            else:
-                for line in lines_angles:
-                    distances.append(distance_to_left_margin(line[0][0], line[0][1]))  
             
             distances.sort()
-            print (distances)
+
+            middle_distance = int((distances[0] + distances[-1])/2)
             middle_point = int(len(distances)/2)
-            print_final_distance_angle(lines_angles[middle_point + jump][1], distances[middle_point], frame)
-            return frame, distances[middle_point], lines_angles[middle_point + jump][1]
+            average_angle = lines_angles[middle_point + jump][1]
+            try:
+                print_final_distance_angle(average_angle, middle_distance, frame)
+            except OverflowError:
+                middle_distance = 0
+                print_final_distance_angle(average_angle, middle_distance, frame)
+            return frame, middle_distance, average_angle
 
-    # except TypeError:
-    #     print('En este frame no hay líneas')
-    #     return frame, -1, -1
-
-    # except ValueError:
-    #     print('En este frame no se detectan líneas por el método probabilístico')
-
-    except IndexError: 
-        print ("La concha de tu madre")
+    except TypeError:
+        print('En este frame no hay líneas')
         return frame, -1, -1
 
-    # print(lines_angles)
-    
-    return frame, -1, -1
-
 def get_line_angle (slope): # Obtain the angle of the line between the point x1,y1 & x2,y2
-    degrees = ((slope * 180)/np.pi) #Transform the radians to degrees with 180/pi
+    degrees = np.degrees(np.arctan(slope)) #Transform the radians to degrees with 180/pi
     return degrees
 
 def get_line_slope (x1,y1,x2,y2): #Get the slope (m) of the line with the line formula y=x*m + c
@@ -126,7 +118,7 @@ def print_angles_frame (x1, y1, x2, y2, angle, frame):
     cv2.putText(frame, str(np.round(angle,decimals=2)), (new_x + 10, rnd_y), font, 1.5, (0,0,0), 2, cv2.LINE_AA)
 
 def print_final_distance_angle(angle, distance, frame):
-    cv2.line(frame,(0, 600),(int(distance), 600), (0,255,0), 2)
+    cv2.line(frame,(0, 600),(distance, 600), (0,255,0), 2)
     font = cv2.FONT_HERSHEY_PLAIN
     cv2.putText(frame, str(np.round(angle,decimals=2)), (10, 550), font, 1.5, (0,0,255), 2, cv2.LINE_AA)
     cv2.putText(frame, str(np.round(distance,decimals=2)) + 'px', (10, 520), font, 1.5, (0,200,255), 2, cv2.LINE_AA)
