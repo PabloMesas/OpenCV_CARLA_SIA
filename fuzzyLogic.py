@@ -18,10 +18,10 @@ class FuzzyLogic():
         # INPUT Variable Angle
         self.angle = ctrl.Antecedent(np.arange(-90, 90, 0.5), 'angle')
         self.angle['too_off-center_right'] = fuzz.gaussmf(self.angle.universe, -90, angleSigma / 1.5)
-        self.angle['slightly_off-center_right'] = fuzz.gaussmf(self.angle.universe, (-90 - angleCenter) / 2, angleSigma)
+        self.angle['slightly_off-center_right'] = fuzz.gaussmf(self.angle.universe, -90 + (90 + angleCenter) / 2, angleSigma)
         self.angle['centered'] = fuzz.gaussmf(self.angle.universe, angleCenter, angleSigma * 1.5)
-        self.angle['slightly_off-center_left'] = fuzz.gaussmf(self.angle.universe, (angleCenter - (-90 - angleCenter)) / 2, angleSigma)
-        self.angle['too_off-center_left'] = fuzz.gaussmf(self.angle.universe, angleCenter - (-90 - angleCenter), angleSigma / 1.5)
+        self.angle['slightly_off-center_left'] = fuzz.gaussmf(self.angle.universe, 0 - angleCenter / 2, angleSigma)
+        self.angle['too_off-center_left'] = fuzz.gaussmf(self.angle.universe, 0, angleSigma / 1.5)
 
         # INPUT Variable Distance
         self.distance = ctrl.Antecedent(np.arange(-1280, 1280, 1), 'distance')
