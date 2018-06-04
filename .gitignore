@@ -9,11 +9,9 @@ Salida2/*
 Originales/longroad2.gif
 Originales/longroad3.gif
 Originales/longroad4.gif
-<<<<<<< HEAD
 Salida/comprobacion.jpg
 __pycache__/*
 
-=======
 MANIFEST.in
 Salida2.tar.gz
 client_example.py
@@ -27,4 +25,4 @@ view_start_positions.py
 *.pdf
 *.zip
 .directory
->>>>>>> 4f679ea0457ef3716d0d8355b550a01a79c5f918
+__pycache__/fuzzyLogic.cpython-35.pyc

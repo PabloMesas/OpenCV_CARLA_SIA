@@ -8,7 +8,7 @@ class FuzzyLogic():
         angleCenter = -62
         angleEdgeDistance = 90
         angleSigma = 6
-        distanceCenter = 215
+        distanceCenter = -215
         distanceEdgeDistance = 1280
         distanceSigma = 300
         forceCenter = 0
@@ -48,8 +48,8 @@ class FuzzyLogic():
         rule6  = ctrl.Rule(self.angle['slightly_off-center_left'] & self.distance['too_far_right'], self.force['turn_left'])
         rule7  = ctrl.Rule(self.angle['slightly_off-center_left'] & self.distance['far_right'], self.force['turn_left'])
         rule8  = ctrl.Rule(self.angle['slightly_off-center_left'] & self.distance['centered'], self.force['slightly_turn_left'])
-        rule9  = ctrl.Rule(self.angle['slightly_off-center_left'] & self.distance['far_left'], self.force['slightly_turn_left'])
-        rule10 = ctrl.Rule(self.angle['slightly_off-center_left'] & self.distance['too_far_left'], self.force['do_nothing'])
+        rule9  = ctrl.Rule(self.angle['slightly_off-center_left'] & self.distance['far_left'], self.force['do_nothing'])
+        rule10 = ctrl.Rule(self.angle['slightly_off-center_left'] & self.distance['too_far_left'], self.force['turn_right'])
         rule11 = ctrl.Rule(self.angle['centered'] & self.distance['too_far_right'], self.force['turn_left'])
         rule12 = ctrl.Rule(self.angle['centered'] & self.distance['far_right'], self.force['slightly_turn_left'])
         rule13 = ctrl.Rule(self.angle['centered'] & self.distance['centered'], self.force['do_nothing'])
@@ -63,8 +63,8 @@ class FuzzyLogic():
         rule21 = ctrl.Rule(self.angle['too_off-center_right'] & self.distance['too_far_right'], self.force['do_nothing'])
         rule22 = ctrl.Rule(self.angle['too_off-center_right'] & self.distance['far_right'], self.force['slightly_turn_right'])
         rule23 = ctrl.Rule(self.angle['too_off-center_right'] & self.distance['centered'], self.force['turn_right'])
-        rule24 = ctrl.Rule(self.angle['too_off-center_right'] & self.distance['far_left'], self.force['turn_left'])
-        rule25 = ctrl.Rule(self.angle['too_off-center_right'] & self.distance['too_far_left'], self.force['turn_left'])
+        rule24 = ctrl.Rule(self.angle['too_off-center_right'] & self.distance['far_left'], self.force['turn_right'])
+        rule25 = ctrl.Rule(self.angle['too_off-center_right'] & self.distance['too_far_left'], self.force['turn_right'])
 
         turning_crtl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5,
                                             rule6, rule7, rule8, rule9, rule10,
