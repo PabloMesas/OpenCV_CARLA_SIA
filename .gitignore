@@ -25,4 +25,4 @@ view_start_positions.py
 *.pdf
 *.zip
 .directory
-__pycache__/fuzzyLogic.cpython-35.pyc
+__pycache__/
