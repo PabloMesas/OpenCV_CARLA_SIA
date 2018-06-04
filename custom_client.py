@@ -26,8 +26,8 @@ from carla.util import print_over_same_line
 def run_carla_client(args):
     # Here we will run 4 episodes with 600 frames each.
     # One episode for each corner of the map
-    number_of_episodes = 1
-    frames_per_episode = 200
+    number_of_episodes = 2
+    frames_per_episode = 1200
 
     # We assume the CARLA server is already waiting for a client to connect at
     # host:port.
@@ -76,7 +76,7 @@ def run_carla_client(args):
         client.load_settings(settings)
         
         # Setting the corners fo the map as starting positions. 
-        start_positions = [46]
+        start_positions = [46, 97]
         
         # Instance fuzzy logic class
         fuzLog = fl.FuzzyLogic()
@@ -116,22 +116,22 @@ def run_carla_client(args):
                                 + '.jpg', frame_data)
                     
                     # Default behaviour will be go straight forward
-                    #next_steer = -0.3
-                    #if # Control distance and angle
-                    #    next_steer = fuzLog.getForce(distance, angle)
+                    next_steer = 0.0
+                    if  distance != -1 and angle != -1:
+                        next_steer = fuzLog.getForce(angle, distance)
                         
                     #print(next_steer)
                     # TODO: wait to fix fuzzylogic module
-                    #client.send_control(
-                    #    steer=next_steer,
-                    #    throttle=0.5,
-                    #    brake=0.0,
-                    #    hand_brake=False,
-                    #    reverse=False)
+                    client.send_control(
+                        steer=next_steer,
+                        throttle=0.5,
+                        brake=0.0,
+                        hand_brake=False,
+                        reverse=False)
                     
                     # In the meantime we will use the default autopilot
-                    control = measurements.player_measurements.autopilot_control
-                    client.send_control(control)
+                    #control = measurements.player_measurements.autopilot_control
+                    #client.send_control(control)
 
                 else:
                     
