@@ -9,6 +9,9 @@ Salida2/*
 Originales/longroad2.gif
 Originales/longroad3.gif
 Originales/longroad4.gif
+Salida/comprobacion.jpg
+__pycache__/*
+
 MANIFEST.in
 Salida2.tar.gz
 client_example.py
@@ -22,3 +25,4 @@ view_start_positions.py
 *.pdf
 *.zip
 .directory
+__pycache__

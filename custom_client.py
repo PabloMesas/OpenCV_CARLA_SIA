@@ -76,7 +76,7 @@ def run_carla_client(args):
         client.load_settings(settings)
         
         # Setting the corners fo the map as starting positions. 
-        start_positions = [46, 97]
+        start_positions = [97, 46]
         
         # Instance fuzzy logic class
         fuzLog = fl.FuzzyLogic()
@@ -117,14 +117,18 @@ def run_carla_client(args):
                     
                     # Default behaviour will be go straight forward
                     next_steer = 0.0
-                    if  distance != -1 and angle != -1:
-                        next_steer = fuzLog.getForce(angle, distance)
+                    try:
+                        if  distance != 3666 and angle != 111:
+                            # print(angle)
+                            next_steer = fuzLog.getForce(angle, distance)
+                    except AttributeError:
+                        print('Tiramos to tieso')
                         
                     #print(next_steer)
                     # TODO: wait to fix fuzzylogic module
                     client.send_control(
                         steer=next_steer,
-                        throttle=0.5,
+                        throttle=0.6,
                         brake=0.0,
                         hand_brake=False,
                         reverse=False)
