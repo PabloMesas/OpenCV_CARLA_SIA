@@ -90,9 +90,6 @@ def run_carla_client(args):
                 try:
                         # Read the data produced by the server this frame.
                     measurements, sensor_data = client.read_data()
-                    
-                    # Print some of the measurements.
-                    print_measurements(measurements)
 
                     # Checking the lines of the road to guide the pilot
                     if args.smart_driver_SIA:
@@ -144,28 +141,6 @@ def run_carla_client(args):
                 except KeyboardInterrupt:
                     print("Ending simulation")
                     continue_episode = False
-
-
-def print_measurements(measurements):
-    number_of_agents = len(measurements.non_player_agents)
-    player_measurements = measurements.player_measurements
-    message = 'Vehicle at ({pos_x:.1f}, {pos_y:.1f}), '
-    message += '{speed:.0f} km/h, '
-    message += 'Collision: {{vehicles={col_cars:.0f}, pedestrians={col_ped:.0f}, other={col_other:.0f}}}, '
-    message += '{other_lane:.0f}% other lane, {offroad:.0f}% off-road, '
-    message += '({agents_num:d} non-player agents in the scene)'
-    message = message.format(
-        pos_x=player_measurements.transform.location.x,
-        pos_y=player_measurements.transform.location.y,
-        speed=player_measurements.forward_speed * 3.6, # m/s -> km/h
-        col_cars=player_measurements.collision_vehicles,
-        col_ped=player_measurements.collision_pedestrians,
-        col_other=player_measurements.collision_other,
-        other_lane=100 * player_measurements.intersection_otherlane,
-        offroad=100 * player_measurements.intersection_offroad,
-        agents_num=number_of_agents)
-    print_over_same_line(message)
-
 
 def main():
     argparser = argparse.ArgumentParser(description=__doc__)

@@ -26,3 +26,4 @@ view_start_positions.py
 *.zip
 .directory
 __pycache__
+_out/*

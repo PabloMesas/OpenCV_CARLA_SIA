@@ -24,8 +24,7 @@ def get_road_line(frame_RGB):
     edges = cv2.Canny(gray,50,150,apertureSize = 3)
     _, binary = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)
 
-    lines_p = cv2.HoughLinesP(edges,1,np.pi/180,80,minLineLength = 50,maxLineGap = 150) #Método que detecta las líneas
-
+    lines_p = cv2.HoughLinesP(edges,1,np.pi/180,80,minLineLength = 50,maxLineGap = 150)
     edges = cv2.cvtColor(edges,cv2.COLOR_GRAY2BGR)
     binary = cv2.cvtColor(binary,cv2.COLOR_GRAY2BGR)
     lines_angles = []
@@ -87,7 +86,6 @@ def get_road_line(frame_RGB):
             
             distances.sort()
             if (not horizonal):
-                print (distances)
                 middle_distance = int((distances[0] + distances[-1])/2)
                 middle_point = int(len(distances)/2)
                 average_angle = lines_angles[middle_point + jump][1]
