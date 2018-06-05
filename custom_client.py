@@ -27,7 +27,6 @@ def run_carla_client(args):
     # Here we will run 2 episodes with 1200 frames each.
     # One episode for each corner of the map
     number_of_episodes = 2
-    frames_per_episode = 1200
 
     # We assume the CARLA server is already waiting for a client to connect at
     # host:port.
@@ -141,7 +140,7 @@ def run_carla_client(args):
                             measurement.save_to_disk(filename)
 
                     frame_counter += 1
-                    
+
                 except KeyboardInterrupt:
                     print("Ending simulation")
                     continue_episode = False
