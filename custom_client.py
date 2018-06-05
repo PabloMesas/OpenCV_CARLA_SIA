@@ -102,7 +102,9 @@ def run_carla_client(args):
                         
                         # Writing the new images on disk
                         # Warning! You must create the dir 'Salida' in the same 
-                        # level respect this script. 
+                        # level respect this script.
+                        cv2.imwrite('Salida_Raw/ep' + str(episode) + 'fr' + str(frame_counter)
+                                    + '.jpg', img)
                         cv2.imwrite('Salida/ep' + str(episode) + 'fr' + str(frame_counter)
                                     + '.jpg', frame_data)
                         

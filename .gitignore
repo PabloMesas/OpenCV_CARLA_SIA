@@ -27,3 +27,5 @@ view_start_positions.py
 .directory
 __pycache__
 _out/*
+Salida_Raw/*
+*.gif

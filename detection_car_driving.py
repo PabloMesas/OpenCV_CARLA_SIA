@@ -86,6 +86,7 @@ def get_road_line(frame_RGB):
             
             distances.sort()
             if (not horizonal):
+                print (distances)
                 middle_distance = int((distances[0] + distances[-1])/2)
                 middle_point = int(len(distances)/2)
                 average_angle = lines_angles[middle_point + jump][1]
