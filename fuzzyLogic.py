@@ -13,7 +13,7 @@ class FuzzyLogic():
         distanceSigma = 100
         forceCenter = 0
         forceEdgeDistance = 1
-        forceSigma = 0.1
+        forceSigma = 0.2
 
         # INPUT Variable Angle
         self.angle = ctrl.Antecedent(np.arange(-90, -34, 0.5), 'angle')
@@ -24,7 +24,7 @@ class FuzzyLogic():
         self.angle['too_off-center_left'] = fuzz.gaussmf(self.angle.universe, angleCenter + 28, angleSigma / 1.5)
 
         # INPUT Variable Distance
-        self.distance = ctrl.Antecedent(np.arange(-1280, 1280, 1), 'distance')
+        self.distance = ctrl.Antecedent(np.arange(-385, 815, 1), 'distance')
         self.distance['too_far_right'] = fuzz.gaussmf(self.distance.universe, distanceCenter - distanceEdgeDistance, distanceSigma / 1.5)
         self.distance['far_right'] = fuzz.gaussmf(self.distance.universe, distanceCenter - distanceEdgeDistance/2, distanceSigma)
         self.distance['centered'] = fuzz.gaussmf(self.distance.universe, distanceCenter, distanceSigma * 1.5)
@@ -43,8 +43,8 @@ class FuzzyLogic():
         rule1  = ctrl.Rule(self.angle['too_off-center_left'] & self.distance['too_far_right'], self.force['turn_left'])
         rule2  = ctrl.Rule(self.angle['too_off-center_left'] & self.distance['far_right'], self.force['turn_left'])
         rule3  = ctrl.Rule(self.angle['too_off-center_left'] & self.distance['centered'], self.force['turn_left'])
-        rule4  = ctrl.Rule(self.angle['too_off-center_left'] & self.distance['far_left'], self.force['slightly_turn_left'])
-        rule5  = ctrl.Rule(self.angle['too_off-center_left'] & self.distance['too_far_left'], self.force['do_nothing'])
+        rule4  = ctrl.Rule(self.angle['too_off-center_left'] & self.distance['far_left'], self.force['slightly_turn_right'])
+        rule5  = ctrl.Rule(self.angle['too_off-center_left'] & self.distance['too_far_left'], self.force['turn_right'])
         rule6  = ctrl.Rule(self.angle['slightly_off-center_left'] & self.distance['too_far_right'], self.force['turn_left'])
         rule7  = ctrl.Rule(self.angle['slightly_off-center_left'] & self.distance['far_right'], self.force['turn_left'])
         rule8  = ctrl.Rule(self.angle['slightly_off-center_left'] & self.distance['centered'], self.force['do_nothing'])
@@ -56,7 +56,7 @@ class FuzzyLogic():
         rule14 = ctrl.Rule(self.angle['centered'] & self.distance['far_left'], self.force['slightly_turn_right'])
         rule15 = ctrl.Rule(self.angle['centered'] & self.distance['too_far_left'], self.force['turn_right'])
         rule16 = ctrl.Rule(self.angle['slightly_off-center_right'] & self.distance['too_far_right'], self.force['turn_left'])
-        rule17 = ctrl.Rule(self.angle['slightly_off-center_right'] & self.distance['far_right'], self.force['do_nothing'])
+        rule17 = ctrl.Rule(self.angle['slightly_off-center_right'] & self.distance['far_right'], self.force['slightly_turn_left'])
         rule18 = ctrl.Rule(self.angle['slightly_off-center_right'] & self.distance['centered'], self.force['slightly_turn_right'])
         rule19 = ctrl.Rule(self.angle['slightly_off-center_right'] & self.distance['far_left'], self.force['turn_right'])
         rule20 = ctrl.Rule(self.angle['slightly_off-center_right'] & self.distance['too_far_left'], self.force['turn_right'])

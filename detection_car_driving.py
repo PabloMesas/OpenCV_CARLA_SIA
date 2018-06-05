@@ -70,7 +70,7 @@ def get_road_line(frame_RGB):
                     d = distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1])
                     distances_1.append(d)
                     average_distances_1 += d
-                average_distances_1 = average_distances_1 / index[0] + 1 
+                average_distances_1 = average_distances_1 /( index[0] + 1) 
                 for i in range(index[0]-1, len(lines_angles), 1):
                     d = distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1])
                     distances_2.append(d)

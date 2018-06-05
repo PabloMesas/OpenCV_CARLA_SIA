@@ -128,7 +128,7 @@ def run_carla_client(args):
                     # TODO: wait to fix fuzzylogic module
                     client.send_control(
                         steer=next_steer,
-                        throttle=0.5,
+                        throttle=0.6,
                         brake=0.0,
                         hand_brake=False,
                         reverse=False)
