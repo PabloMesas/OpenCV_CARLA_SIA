@@ -118,6 +118,7 @@ def run_carla_client(args):
                     # Default behaviour will be go straight forward
                     next_steer = 0.0
                     if  distance != -1 and angle != -1:
+                        print(angle)
                         next_steer = fuzLog.getForce(angle, distance)
                         
                     #print(next_steer)
