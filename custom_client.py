@@ -24,7 +24,7 @@ from carla.tcp import TCPConnectionError
 from carla.util import print_over_same_line
 
 def run_carla_client(args):
-    # Here we will run 4 episodes with 600 frames each.
+    # Here we will run 2 episodes with 1200 frames each.
     # One episode for each corner of the map
     number_of_episodes = 2
     frames_per_episode = 1200
@@ -32,43 +32,35 @@ def run_carla_client(args):
     # We assume the CARLA server is already waiting for a client to connect at
     # host:port.
     with make_carla_client(args.host, args.port) as client:
-        #print('CarlaClient connected')
+        print('CarlaClient connected')
+           
+        # Create a CarlaSettings object. This object is a wrapper around
+        # the CarlaSettings.ini file.
+        settings = CarlaSettings()
+        settings.set(
+            SynchronousMode=True,
+            SendNonPlayerAgentsInfo=True,
+            NumberOfVehicles=0,
+            NumberOfPedestrians=0,
+            WeatherId=1,
+            QualityLevel=args.quality_level)
+        settings.randomize_seeds()
+
+        # Now we want to add a camera to the player vehicle. We
+        # will collect the images produced by these cameras every
+        # frame.
+
+        # The default camera captures RGB images of the scene.
+        camera0 = Camera('CameraRGB')
+        # Fish eye
+        camera0.set(FOV=140.0)
+        # Set image resolution in pixels.
+        camera0.set_image_size(1280, 720)
+        # Set its position relative to the car in meters
+        # (At the end of the car's hood).
+        camera0.set_position(2.10, 0, 1.10)
+        settings.add_sensor(camera0)
         
-        if args.settings_filepath is None:
-            
-            # Create a CarlaSettings object. This object is a wrapper around
-            # the CarlaSettings.ini file.
-            settings = CarlaSettings()
-            settings.set(
-                SynchronousMode=True,
-                SendNonPlayerAgentsInfo=True,
-                NumberOfVehicles=0,
-                NumberOfPedestrians=0,
-                WeatherId=1,
-                QualityLevel=args.quality_level)
-            settings.randomize_seeds()
-
-            # Now we want to add a camera to the player vehicle. We
-            # will collect the images produced by these cameras every
-            # frame.
-
-            # The default camera captures RGB images of the scene.
-            camera0 = Camera('CameraRGB')
-            # Fish eye
-            camera0.set(FOV=140.0)
-            # Set image resolution in pixels.
-            camera0.set_image_size(1280, 720)
-            # Set its position relative to the car in meters
-            # (At the end of the car's hood).
-            camera0.set_position(2.10, 0, 1.10)
-            settings.add_sensor(camera0)
-        
-        else:
-
-                # Alternatively, we can load these settings from a file.
-                with open(args.settings_filepath, 'r') as fp:
-                    settings = fp.read()
-
         # Now we load these settings into the server. The server replies
         # with a scene description containing the available start spots for
         # the player. Here we can provide a CarlaSettings object or a
@@ -92,68 +84,67 @@ def run_carla_client(args):
             client.start_episode(player_start)
             
             # Iterate every frame in the episode.
-            for frame in range(0, frames_per_episode):
+            frame_counter = 0
+            continue_episode = True
             
-                # Read the data produced by the server this frame.
-                measurements, sensor_data = client.read_data()
-                
-                # Print some of the measurements.
-                #print_measurements(measurements)
+            while continue_episode:
+                try:
+                        # Read the data produced by the server this frame.
+                    measurements, sensor_data = client.read_data()
+                    
+                    # Print some of the measurements.
+                    print_measurements(measurements)
 
-                # Checking the lines of the road to guide the pilot
-                if args.smart_driver_SIA:
-                    # Convert the frame to BGR
-                    img = cv2.cvtColor(sensor_data['CameraRGB'].data,
-                                    cv2.COLOR_RGB2BGR)
-                    # Obtain the image with the lines of the road drawn and the
-                    # degrees of the line relative the vertical of the camera
-                    frame_data, distance, angle = eyes.get_road_line(img)
-                    
-                    # Writing the new images on disk
-                    # Warning! You must create the dir 'Salida' in the same 
-                    # level respect this script. 
-                    cv2.imwrite('Salida/ep' + str(episode) + 'fr' + str(frame)
-                                + '.jpg', frame_data)
-                    
-                    # Default behaviour will be go straight forward
-                    next_steer = 0.0
-                    try:
-                        if  distance != 3666 and angle != 111:
-                            # print(angle)
-                            next_steer = fuzLog.getForce(angle, distance)
-                    except AttributeError:
-                        print('Tiramos to tieso')
+                    # Checking the lines of the road to guide the pilot
+                    if args.smart_driver_SIA:
+                        # Convert the frame to BGR
+                        img = cv2.cvtColor(sensor_data['CameraRGB'].data,
+                                        cv2.COLOR_RGB2BGR)
+                        # Obtain the image with the lines of the road drawn and the
+                        # degrees of the line relative the vertical of the camera
+                        frame_data, distance, angle = eyes.get_road_line(img)
                         
-                    #print(next_steer)
-                    # TODO: wait to fix fuzzylogic module
-                    client.send_control(
-                        steer=next_steer,
-                        throttle=0.6,
-                        brake=0.0,
-                        hand_brake=False,
-                        reverse=False)
-                    
-                    # In the meantime we will use the default autopilot
-                    #control = measurements.player_measurements.autopilot_control
-                    #client.send_control(control)
+                        # Writing the new images on disk
+                        # Warning! You must create the dir 'Salida' in the same 
+                        # level respect this script. 
+                        cv2.imwrite('Salida/ep' + str(episode) + 'fr' + str(frame_counter)
+                                    + '.jpg', frame_data)
+                        
+                        # Default behaviour will be go straight forward
+                        next_steer = 0.0
+                        # In case we receive a control signal from detection_car_driving
+                        if  distance != 3666 and angle != 111:
+                            next_steer = fuzLog.getForce(angle, distance)
+                            
+                        client.send_control(
+                            steer=next_steer,
+                            throttle=0.6,
+                            brake=0.0,
+                            hand_brake=False,
+                            reverse=False)
 
-                else:
-                    
-                    # Run the default autopilot. 
-                    # Together with the measurements, the server has sent the
-                    # control that the in-game autopilot would do this frame. We
-                    # can enable autopilot by sending back this control to the
-                    # server. We can modify it if wanted, here for instance we
-                    # will add some noise to the steer.
+                    else:
+                        
+                        # Run the default autopilot. 
+                        # Together with the measurements, the server has sent the
+                        # control that the in-game autopilot would do this frame. We
+                        # can enable autopilot by sending back this control to the
+                        # server.
 
-                    control = measurements.player_measurements.autopilot_control
-                    client.send_control(control)
-    
-                # Save the images to disk if requested.
-                if args.save_images_to_disk:
-                    for name, measurement in sensor_data.items():
-                        filename = args.out_filename_format.format(episode, name, frame)
-                        measurement.save_to_disk(filename)
+                        control = measurements.player_measurements.autopilot_control
+                        client.send_control(control)
+        
+                    # Save the images to disk if requested.
+                    if args.save_images_to_disk:
+                        for name, measurement in sensor_data.items():
+                            filename = args.out_filename_format.format(episode, name, frame_counter)
+                            measurement.save_to_disk(filename)
+
+                    frame_counter += 1
+                    
+                except KeyboardInterrupt:
+                    print("Ending simulation")
+                    continue_episode = False
 
 
 def print_measurements(measurements):
@@ -196,10 +187,6 @@ def main():
         type=int,
         help='TCP port to listen to (default: 2000)')
     argparser.add_argument(
-        '-l', '--lidar',
-        action='store_true',
-        help='enable Lidar')
-    argparser.add_argument(
         '-q', '--quality-level',
         choices=['Low', 'Epic'],
         type=lambda s: s.title(),
@@ -215,12 +202,6 @@ def main():
         action='store_true',
         dest='smart_driver_SIA',
         help='use the smart brain developed in SIA to pilot the vehicle')
-    argparser.add_argument(
-        '-c', '--carla-settings',
-        metavar='PATH',
-        dest='settings_filepath',
-        default=None,
-        help='Path to a "CarlaSettings.ini" file')
 
     args = argparser.parse_args()
 
