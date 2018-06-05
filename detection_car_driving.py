@@ -47,7 +47,7 @@ def get_road_line(frame_RGB):
    
             lines_angles = sorted(lines_angles, key=lambda line: line[1]) # Sorting by angles
             on_the_middle = (lines_angles[0][1] > -90 and lines_angles[0][1] < -70) and (lines_angles[-1][1] < 90 and lines_angles[-1][1] > 70)
-            horizonal = True
+            horizonal = True # To know if we have horizontal lines on the frame
             if abs(lines_angles[0][1] - lines_angles[-1][1]) <= 10  or on_the_middle:
                 for line in lines_angles:
                     if abs(line[1]) > 2.5 and horizonal:
@@ -55,12 +55,12 @@ def get_road_line(frame_RGB):
                     distances.append(distance_to_left_margin(line[0][0], line[0][1]))
 
             else:
-                horizonal = False
+                horizonal = False 
                 sorted_angles = []
                 index = []
                 for pair in lines_angles:
                    sorted_angles.append(pair[1])
-                index = get_clusters(sorted_angles, 2)
+                index = get_clusters(sorted_angles, 2) #To get a cluster of two groups
 
                 distances_1 = []
                 average_distances_1 = 0
@@ -75,22 +75,15 @@ def get_road_line(frame_RGB):
                     d = distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1])
                     distances_2.append(d)
                     average_distances_2 += d
-                # print (average_distances_2)
-                # print(len(lines_angles))
-                # print(index[0])
                 average_distances_2 = average_distances_2 / (len(lines_angles) - index[0] + 1)
 
                 if abs(average_distances_1) < abs(average_distances_2):
                     #First Cluster is Good One
-                    # print('*********1*************')
                     distances = distances_1
                 else:
                     #Second Cluster is Good One
-                    print('*********2*************')
                     distances = distances_2
-                    jump = index[0]-1
-
-                    # print(distances)
+                    jump = index[0]-1 # Index to start the second Cluster
             
             distances.sort()
             if (not horizonal):
@@ -99,19 +92,19 @@ def get_road_line(frame_RGB):
                 middle_point = int(len(distances)/2)
                 average_angle = lines_angles[middle_point + jump][1]
             else:
+                #Extreme unuseful values
                 middle_distance = 3666
                 average_angle = 111
             try:
                 print_final_distance_angle(average_angle, middle_distance, frame)
             except OverflowError:
                 middle_distance = 0
-                print ('OverFlowErrorLocoUnidasPodemosIzquirdaUnidaEquo')
                 print_final_distance_angle(average_angle, middle_distance, frame)
             return frame, middle_distance, average_angle
 
     except TypeError:
         print('En este frame no hay líneas')
-        return frame, 3666, 111
+        return frame, 3666, 111 #Extreme unuseful values
 
 def get_line_angle (slope): # Obtain the angle of the line between the point x1,y1 & x2,y2
     degrees = np.degrees(np.arctan(slope)) #Transform the radians to degrees with 180/pi
