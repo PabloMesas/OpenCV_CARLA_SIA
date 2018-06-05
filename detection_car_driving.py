@@ -61,28 +61,40 @@ def get_road_line(frame_RGB):
                 for pair in lines_angles:
                    sorted_angles.append(pair[1])
                 index = get_clusters(sorted_angles, 2)
-                for i in range(0,len(lines_angles), 1):
-                    print(lines_angles[i][1])
-                distance_1 = distance_to_left_margin(lines_angles[0][0][0], lines_angles[0][0][1]) 
-                distance_2 = distance_to_left_margin(lines_angles[index[0]-1][0][0], lines_angles[index[0]-1][0][1])
-                if abs(distance_1) < abs(distance_2):
+
+                distances_1 = []
+                average_distances_1 = 0
+                distances_2 = []
+                average_distances_2 = 0
+                for i in range(0, index[0]-1, 1):
+                    d = distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1])
+                    distances_1.append(d)
+                    average_distances_1 += d
+                average_distances_1 = average_distances_1 / index[0] + 1 
+                for i in range(index[0]-1, len(lines_angles), 1):
+                    d = distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1])
+                    distances_2.append(d)
+                    average_distances_2 += d
+                # print (average_distances_2)
+                # print(len(lines_angles))
+                # print(index[0])
+                average_distances_2 = average_distances_2 / (len(lines_angles) - index[0] + 1)
+
+                if abs(average_distances_1) < abs(average_distances_2):
                     #First Cluster is Good One
                     # print('*********1*************')
-                    for i in range(0, index[0]-1, 1):
-                        distances.append(distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1]))
+                    distances = distances_1
                 else:
                     #Second Cluster is Good One
                     print('*********2*************')
-                    for i in range(index[0]-1, len(lines_angles), 1):
-                        print (lines_angles[i][1])
-                        distances.append(distance_to_left_margin(lines_angles[i][0][0], lines_angles[i][0][1]))
+                    distances = distances_2
                     jump = index[0]-1
-                    print('**********************')
 
                     # print(distances)
             
             distances.sort()
             if (not horizonal):
+                print (distances)
                 middle_distance = int((distances[0] + distances[-1])/2)
                 middle_point = int(len(distances)/2)
                 average_angle = lines_angles[middle_point + jump][1]
