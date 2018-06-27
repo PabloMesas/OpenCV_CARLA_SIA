@@ -10,5 +10,3 @@ Todos estos ficheros deben de ser exportados a la carpeta ` CARLA_X.X.X/PythonCl
 
 
 `./custom_client.py -s`
-
->El resto de ficheros son de pruebas y serán eliminados .
